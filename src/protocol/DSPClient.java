@@ -1,6 +1,6 @@
 package protocol;
 
-public class DSPClient implements DistributedSortingProtocol {
+public class DSPClient {
 	
 	public static final int WAITING = 0;
 	public static final int ACCEPTED = 1;
@@ -13,7 +13,7 @@ public class DSPClient implements DistributedSortingProtocol {
 	
 	private int state;
 	private String[] addresses;
-	private int port;
+//	private int port;
 	private String services;
 	private String requests;
 	private String data;
@@ -39,13 +39,13 @@ public class DSPClient implements DistributedSortingProtocol {
 		this.addresses = addresses;
 	}
 
-	public int getPort() {
-		return port;
-	}
-	
-	public void setPort(int port) {
-		this.port = port;
-	}
+//	public int getPort() {
+//		return port;
+//	}
+//	
+//	public void setPort(int port) {
+//		this.port = port;
+//	}
 	
 	public String getServices() {
 		return services;
@@ -71,7 +71,6 @@ public class DSPClient implements DistributedSortingProtocol {
 		this.data = data;
 	}
 
-	@Override
 	public int parseProtocolMessage(String message) {
 		// TODO Auto-generated method stub
 		
@@ -116,10 +115,6 @@ public class DSPClient implements DistributedSortingProtocol {
 			}
 			break;
 			
-			case "SORT": {
-				
-			}
-			
 			case "NOT_FOUND": {
 				
 				setState(DSPClient.NOT_FOUND);
@@ -133,7 +128,12 @@ public class DSPClient implements DistributedSortingProtocol {
 			
 			case "FINISHED": {
 				
-				setState(DSPClient.FINISHED);
+				if(pOptions != null && pOptions.length()>0) {
+					setData(pOptions);
+					setState(DSPClient.FINISHED);
+				} else {
+					setState(DSPClient.ERROR);
+				}
 			}
 			break;
 			
@@ -150,51 +150,32 @@ public class DSPClient implements DistributedSortingProtocol {
 		return getState();
 	}
 
-	@Override
-	public String generateResponse() {
-		// TODO Auto-generated method stub
-		String response = new String();
-		
-		if(getState() == DSPClient.ERROR) {
-			response = "ERROR";
-		}
-		if(getState() == DSPClient.NOT_FOUND) {
-			response = "NOT_FOUND";
-		}
-		if(getState() == DSPClient.FINISHED) {
-			response = "OK";
-		}
-		if(getState() == DSPClient.DISCONNECT) {
-			response = "BYE";
-		}
-		
-		return response+'\n';
+	
+	public String connectToMainServer(String services, int port) {
+		setServices(services);
+		return "HELLO "+services+" "+port+'\n';
 	}
 	
-	public String generateResponse(String message) {
-		// TODO Auto-generated method stub
-		String response = new String();
-		
-		if(getState() == DSPClient.PEERS) {
-			response = "PEERS "+message;
-		} else if(getState() == DSPClient.ERROR){
-			response = "ERROR";
-		} else {
-			throw new RuntimeException("This method is used only when responding to PEERS request.");
-		}
-		
-		return response+'\n';
+	public String askForPeers(String request) {
+		setRequests(request);
+		return "PEERS "+request+'\n';
 	}
 	
-	private boolean isInteger(String s) {
-		try {
-			@SuppressWarnings("unused")
-			int i = Integer.parseInt(s);
-		} catch (NumberFormatException e) {
-			// TODO: handle exception
-			return false;
-		}
-		return true;
+	public String finishedSorting() {
+		return "FINISHED"+'\n';
 	}
-
+	
+	public String generateSortRequest(String data) {
+		setData(data);
+		return "SORT "+getRequests()+" "+data+'\n';
+	}
+	
+	public String generateSortRequest(String data, int iteration) {
+		setData(data);
+		return "SORT "+getRequests()+"#"+iteration+" "+data+'\n';
+	}
+	
+	public String sayGoodbye() {
+		return "BYE"+'\n';
+	}
 }
