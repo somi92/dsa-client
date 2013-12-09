@@ -13,16 +13,8 @@ import protocol.DSPClient;
 public class ClientThread implements Runnable {
 
 	private Socket mainServer;
-	private Socket sServer1;
-	private Socket sServer2;
-	
-//	private BufferedReader mainServerInput;
-//	private BufferedReader sServer1Input;
-//	private BufferedReader sServer2Input;
-//	
-//	private DataOutputStream mainServerOutput;
-//	private DataOutputStream sServer1Output;
-//	private DataOutputStream sServer2Output;
+//	private Socket sServer1;
+//	private Socket sServer2;
 	
 	private int mainServerPort;
 	private String mainServerIP;
@@ -75,6 +67,14 @@ public class ClientThread implements Runnable {
 		this.serverSidePort = serverSidePort;
 	}
 
+	public boolean isConnectionTerminated() {
+		return connectionTerminated;
+	}
+
+	public void setConnectionTerminated(boolean connectionTerminated) {
+		this.connectionTerminated = connectionTerminated;
+	}
+
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
@@ -87,13 +87,7 @@ public class ClientThread implements Runnable {
 			BufferedReader mainServerInput = new BufferedReader(new InputStreamReader(this.mainServer.getInputStream()));
 			DataOutputStream mainServerOutput = new DataOutputStream(this.mainServer.getOutputStream());
 			
-//			BufferedReader sServer1Input;
-//			BufferedReader sServer2Input;		
-//			DataOutputStream mainServerOutput;
-//			DataOutputStream sServer1Output;
-//			DataOutputStream sServer2Output;
-			
-			while(!this.connectionTerminated) {
+//			while(!this.connectionTerminated) {
 				
 				String request = protocol.connectToMainServer(getServices(), getServerSidePort());
 				mainServerOutput.writeBytes(request);
@@ -129,7 +123,8 @@ public class ClientThread implements Runnable {
 				}
 				
 				
-			}
+//			}
+			mainServer.close();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
