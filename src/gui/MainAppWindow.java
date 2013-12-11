@@ -34,7 +34,7 @@ public class MainAppWindow {
 	private JPanel panelServer;
 	private JLabel label;
 	private JButton btnConnect;
-	private JLabel label_1;
+	private JLabel lblStatus;
 	private JButton btnDisconnect;
 	private JPanel panelClient;
 	private JTextField txtArray;
@@ -54,6 +54,7 @@ public class MainAppWindow {
 	private ClientThread client;
 	
 	private String data = "";
+	private JPanel panel;
 	/**
 	 * Launch the application.
 	 */
@@ -101,6 +102,11 @@ public class MainAppWindow {
 	public void manageButtons() {
 		btnConnect.setEnabled(!btnConnect.isEnabled());
 		btnDisconnect.setEnabled(!btnDisconnect.isEnabled());
+		if(btnConnect.isEnabled()) {
+			lblStatus.setText("Niste prijavljeni na glavni server.");
+		} else {
+			lblStatus.setText("Prijavljeni ste na glavni server.");
+		}
 	}
 	
 	public String getData() {
@@ -115,14 +121,20 @@ public class MainAppWindow {
 //		btnConnect.setEnabled(true);
 //		btnDisconnect.setEnabled(false);
 	}
+	
+	public void updateLog(StringBuffer data) {
+//		txtLog.setText(data.toString());
+		txtLog.append(data.toString());
+	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
 		frmMainAppWindow = new JFrame();
+		frmMainAppWindow.setResizable(false);
 		frmMainAppWindow.setTitle("Aplikacija za distribuirano sortiranje");
-		frmMainAppWindow.setBounds(100, 100, 727, 635);
+		frmMainAppWindow.setBounds(100, 100, 812, 571);
 		frmMainAppWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmMainAppWindow.getContentPane().add(getPanelServer(), BorderLayout.NORTH);
 		frmMainAppWindow.getContentPane().add(getPanelClient(), BorderLayout.CENTER);
@@ -150,13 +162,13 @@ public class MainAppWindow {
 			gbc_btnConnect.gridx = 2;
 			gbc_btnConnect.gridy = 2;
 			panelServer.add(getBtnConnect(), gbc_btnConnect);
-			GridBagConstraints gbc_label_1 = new GridBagConstraints();
-			gbc_label_1.fill = GridBagConstraints.VERTICAL;
-			gbc_label_1.anchor = GridBagConstraints.EAST;
-			gbc_label_1.insets = new Insets(0, 0, 5, 5);
-			gbc_label_1.gridx = 3;
-			gbc_label_1.gridy = 2;
-			panelServer.add(getLabel_1(), gbc_label_1);
+			GridBagConstraints gbc_lblStatus = new GridBagConstraints();
+			gbc_lblStatus.fill = GridBagConstraints.VERTICAL;
+			gbc_lblStatus.anchor = GridBagConstraints.EAST;
+			gbc_lblStatus.insets = new Insets(0, 0, 5, 5);
+			gbc_lblStatus.gridx = 3;
+			gbc_lblStatus.gridy = 2;
+			panelServer.add(getLblStatus(), gbc_lblStatus);
 			GridBagConstraints gbc_btnDisconnect = new GridBagConstraints();
 			gbc_btnDisconnect.fill = GridBagConstraints.BOTH;
 			gbc_btnDisconnect.insets = new Insets(0, 0, 5, 5);
@@ -188,12 +200,12 @@ public class MainAppWindow {
 		}
 		return btnConnect;
 	}
-	private JLabel getLabel_1() {
-		if (label_1 == null) {
-			label_1 = new JLabel("Niste prijavljeni na glavni server.");
-			label_1.setHorizontalAlignment(SwingConstants.LEFT);
+	private JLabel getLblStatus() {
+		if (lblStatus == null) {
+			lblStatus = new JLabel("Niste prijavljeni na glavni server.");
+			lblStatus.setHorizontalAlignment(SwingConstants.LEFT);
 		}
-		return label_1;
+		return lblStatus;
 	}
 	private JButton getBtnDisconnect() {
 		if (btnDisconnect == null) {
@@ -214,23 +226,17 @@ public class MainAppWindow {
 			panelClient.setAlignmentY(0.0f);
 			panelClient.setAlignmentX(0.0f);
 			GridBagLayout gbl_panelClient = new GridBagLayout();
-			gbl_panelClient.columnWidths = new int[]{39, 539, 114, 0};
+			gbl_panelClient.columnWidths = new int[]{39, 701, 35, 0};
 			gbl_panelClient.rowHeights = new int[]{30, 0, 0, 0, 34, 174, 0};
-			gbl_panelClient.columnWeights = new double[]{0.0, 1.0, 1.0, Double.MIN_VALUE};
-			gbl_panelClient.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+			gbl_panelClient.columnWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
+			gbl_panelClient.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
 			panelClient.setLayout(gbl_panelClient);
-			GridBagConstraints gbc_txtArray = new GridBagConstraints();
-			gbc_txtArray.fill = GridBagConstraints.BOTH;
-			gbc_txtArray.insets = new Insets(0, 0, 5, 5);
-			gbc_txtArray.gridx = 1;
-			gbc_txtArray.gridy = 1;
-			panelClient.add(getTxtArray(), gbc_txtArray);
-			GridBagConstraints gbc_btnSort = new GridBagConstraints();
-			gbc_btnSort.anchor = GridBagConstraints.WEST;
-			gbc_btnSort.insets = new Insets(0, 0, 5, 0);
-			gbc_btnSort.gridx = 2;
-			gbc_btnSort.gridy = 1;
-			panelClient.add(getBtnSort(), gbc_btnSort);
+			GridBagConstraints gbc_panel = new GridBagConstraints();
+			gbc_panel.insets = new Insets(0, 0, 5, 5);
+			gbc_panel.fill = GridBagConstraints.BOTH;
+			gbc_panel.gridx = 1;
+			gbc_panel.gridy = 1;
+			panelClient.add(getPanel(), gbc_panel);
 			GridBagConstraints gbc_panelButtons = new GridBagConstraints();
 			gbc_panelButtons.fill = GridBagConstraints.VERTICAL;
 			gbc_panelButtons.anchor = GridBagConstraints.WEST;
@@ -256,8 +262,9 @@ public class MainAppWindow {
 	private JTextField getTxtArray() {
 		if (txtArray == null) {
 			txtArray = new JTextField();
+			txtArray.setSize(new Dimension(400, 0));
 			txtArray.setToolTipText("Unesite niz koji zelite da sortirate, elemente odvojite zarezima");
-			txtArray.setPreferredSize(new Dimension(200, 30));
+			txtArray.setPreferredSize(new Dimension(500, 30));
 			txtArray.setEnabled(false);
 			txtArray.setColumns(10);
 		}
@@ -337,10 +344,33 @@ public class MainAppWindow {
 	private JTextArea getTxtLog() {
 		if (txtLog == null) {
 			txtLog = new JTextArea();
-			txtLog.setLineWrap(true);
 			txtLog.setToolTipText("Dnevnik prikazuje komunikaciju na mrezi");
 			txtLog.setEditable(false);
 		}
 		return txtLog;
+	}
+	private JPanel getPanel() {
+		if (panel == null) {
+			panel = new JPanel();
+			GridBagLayout gbl_panel = new GridBagLayout();
+			gbl_panel.columnWidths = new int[]{588, 128, 0, 0};
+			gbl_panel.rowHeights = new int[]{30, 0};
+			gbl_panel.columnWeights = new double[]{1.0, 0.0, 0.0, Double.MIN_VALUE};
+			gbl_panel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+			panel.setLayout(gbl_panel);
+			GridBagConstraints gbc_txtArray = new GridBagConstraints();
+			gbc_txtArray.fill = GridBagConstraints.BOTH;
+			gbc_txtArray.insets = new Insets(0, 0, 0, 5);
+			gbc_txtArray.gridx = 0;
+			gbc_txtArray.gridy = 0;
+			panel.add(getTxtArray(), gbc_txtArray);
+			GridBagConstraints gbc_btnSort = new GridBagConstraints();
+			gbc_btnSort.insets = new Insets(0, 0, 0, 5);
+			gbc_btnSort.fill = GridBagConstraints.BOTH;
+			gbc_btnSort.gridx = 1;
+			gbc_btnSort.gridy = 0;
+			panel.add(getBtnSort(), gbc_btnSort);
+		}
+		return panel;
 	}
 }

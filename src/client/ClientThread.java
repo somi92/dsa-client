@@ -7,8 +7,6 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.GregorianCalendar;
-
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import protocol.DSPClient;
@@ -32,6 +30,8 @@ public class ClientThread implements Runnable {
 	private String mainServerIP;
 	private String services;
 	private int serverSidePort;
+	
+	private StringBuffer log = new StringBuffer("");
 	
 	private boolean connectionTerminated;
 	
@@ -183,7 +183,9 @@ public class ClientThread implements Runnable {
 			
 			String request = this.protocol.connectToMainServer(getServices(), getServerSidePort());
 			mainServerOutput.writeBytes(request);
-			System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za prijavu glavnom serveru: "+request);
+//			System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za prijavu glavnom serveru: "+request);
+			this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za prijavu glavnom serveru: "+request);
+			this.parent.updateLog(this.log);
 			
 			String serverResponse = mainServerInput.readLine();
 			int responseCode = this.protocol.parseProtocolMessage(serverResponse);
@@ -191,7 +193,9 @@ public class ClientThread implements Runnable {
 			switch(responseCode) {
 			
 			case DSPClient.ACCEPTED: {
-				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste prijavljeni! Server: "+serverResponse);
+//				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste prijavljeni! Server: "+serverResponse);
+				this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste prijavljeni! Server: "+serverResponse+'\n');
+				this.parent.updateLog(this.log);
 				this.parent.manageButtons();
 			}
 			break;
@@ -202,7 +206,9 @@ public class ClientThread implements Runnable {
 //			break;
 			
 			case DSPClient.ERROR: {
-				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse);
+//				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse);
+				this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse+'\n');
+				this.parent.updateLog(this.log);
 			}
 			break;
 			
@@ -212,7 +218,9 @@ public class ClientThread implements Runnable {
 //			break;
 			
 			default: {
-				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+//				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+				this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse+'\n');
+				this.parent.updateLog(this.log);
 			}
 		}
 		} catch (Exception e) {
@@ -230,7 +238,9 @@ public class ClientThread implements Runnable {
 			
 			String request = this.protocol.sayGoodbye();
 			mainServerOutput.writeBytes(request);
-			System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za prijavu glavnom serveru: "+request);
+//			System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za prijavu glavnom serveru: "+request);
+			this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za odjavu glavnom serveru: "+request);
+			this.parent.updateLog(this.log);
 			
 			String serverResponse = mainServerInput.readLine();
 			int responseCode = this.protocol.parseProtocolMessage(serverResponse);
@@ -238,10 +248,12 @@ public class ClientThread implements Runnable {
 			switch(responseCode) {
 						
 						case DSPClient.DISCONNECT: {
-							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste odjavljeni! Server: "+serverResponse);
+//							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste odjavljeni! Server: "+serverResponse);
+							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste odjavljeni! Server: "+serverResponse+'\n');
 							mainServerInput.close();
 							mainServerOutput.close();
 							this.mainServer.close();
+							this.parent.updateLog(this.log);
 							this.parent.manageButtons();
 						}
 						break;
@@ -252,7 +264,9 @@ public class ClientThread implements Runnable {
 			//			break;
 						
 						case DSPClient.ERROR: {
-							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse);
+//							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse);
+							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse+'\n');
+							this.parent.updateLog(this.log);
 						}
 						break;
 						
@@ -262,7 +276,10 @@ public class ClientThread implements Runnable {
 			//			break;
 						
 						default: {
-							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+//							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse+'\n');
+							this.parent.updateLog(this.log);
+							
 						}
 					}
 		} catch (Exception e) {
