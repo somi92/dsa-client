@@ -1,10 +1,15 @@
 package client;
 
+import gui.MainAppWindow;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.GregorianCalendar;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import protocol.DSPClient;
 
@@ -14,6 +19,8 @@ public class ClientThread implements Runnable {
 //	private Socket sServer1;
 //	private Socket sServer2;
 	private DSPClient protocol;
+	
+	private MainAppWindow parent;
 	
 	public static final int CONNECT = 1;
 	public static final int ASK_FOR_PEERS = 2;
@@ -30,6 +37,10 @@ public class ClientThread implements Runnable {
 	
 	public ClientThread() {
 		this.connectionTerminated = false;
+	}
+	
+	public ClientThread(MainAppWindow parent) {
+		this.parent = parent;
 	}
 	
 	public ClientThread(String mainServerIP,int mainServerPort) {
@@ -181,6 +192,7 @@ public class ClientThread implements Runnable {
 			
 			case DSPClient.ACCEPTED: {
 				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste prijavljeni! Server: "+serverResponse);
+				this.parent.manageButtons();
 			}
 			break;
 			
@@ -205,6 +217,7 @@ public class ClientThread implements Runnable {
 		}
 		} catch (Exception e) {
 			// TODO: handle exception
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Greska!", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -229,6 +242,7 @@ public class ClientThread implements Runnable {
 							mainServerInput.close();
 							mainServerOutput.close();
 							this.mainServer.close();
+							this.parent.manageButtons();
 						}
 						break;
 						
@@ -253,6 +267,7 @@ public class ClientThread implements Runnable {
 					}
 		} catch (Exception e) {
 			// TODO: handle exception
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Greska!", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	

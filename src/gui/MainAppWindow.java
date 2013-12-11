@@ -25,6 +25,8 @@ import client.ClientThread;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MainAppWindow {
 
@@ -47,8 +49,9 @@ public class MainAppWindow {
 	private JButton button_3;
 	private JTextArea txtLog;
 
-	private Thread client;
-	private ClientThread c;
+//	private Thread client;
+	private Executor clientExecutor = Executors.newSingleThreadExecutor();
+	private ClientThread client;
 	
 	private String data = "";
 	/**
@@ -82,16 +85,22 @@ public class MainAppWindow {
 		}
 		this.data = data;
 		String[] dataArray = data.split(" ");
-		this.c = new ClientThread();
-		this.c.setMainServerIP(dataArray[0]);
-		this.c.setMainServerPort(Integer.parseInt(dataArray[1]));
-		this.c.setServerSidePort(Integer.parseInt(dataArray[2]));
-		this.c.setServices(dataArray[3]);
-		this.c.setTask(ClientThread.CONNECT);
-		this.client = new Thread(c);
-		this.client.start();
-		btnConnect.setEnabled(false);
-		btnDisconnect.setEnabled(true);
+		this.client = new ClientThread(MainAppWindow.this);
+		this.client.setMainServerIP(dataArray[0]);
+		this.client.setMainServerPort(Integer.parseInt(dataArray[1]));
+		this.client.setServerSidePort(Integer.parseInt(dataArray[2]));
+		this.client.setServices(dataArray[3]);
+		this.client.setTask(ClientThread.CONNECT);
+//		this.client = new Thread(c);
+//		this.client.start();
+		this.clientExecutor.execute(client);
+//		btnConnect.setEnabled(false);
+//		btnDisconnect.setEnabled(true);
+	}
+	
+	public void manageButtons() {
+		btnConnect.setEnabled(!btnConnect.isEnabled());
+		btnDisconnect.setEnabled(!btnDisconnect.isEnabled());
 	}
 	
 	public String getData() {
@@ -99,11 +108,12 @@ public class MainAppWindow {
 	}
 	
 	public void closeConnection() {
-		this.c.setTask(ClientThread.DISCONNECT);
-		this.client = new Thread(c);
-		this.client.start();
-		btnConnect.setEnabled(true);
-		btnDisconnect.setEnabled(false);
+		this.client.setTask(ClientThread.DISCONNECT);
+//		this.client = new Thread(c);
+//		this.client.start();
+		this.clientExecutor.execute(client);
+//		btnConnect.setEnabled(true);
+//		btnDisconnect.setEnabled(false);
 	}
 
 	/**
@@ -315,8 +325,8 @@ public class MainAppWindow {
 				public void actionPerformed(ActionEvent arg0) {
 //					System.out.println(data);
 //					System.out.println(client.isAlive());
-					System.out.println(client.getState());
-					client.start();
+//					System.out.println(client.getState());
+//					client.start();
 //					client.interrupt();
 //					System.out.println(client.toString());
 				}
