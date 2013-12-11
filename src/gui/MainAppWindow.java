@@ -20,6 +20,9 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import client.ClientThread;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -44,6 +47,10 @@ public class MainAppWindow {
 	private JButton button_3;
 	private JTextArea txtLog;
 
+	private Thread client;
+	private ClientThread c;
+	
+	private String data = "";
 	/**
 	 * Launch the application.
 	 */
@@ -67,6 +74,37 @@ public class MainAppWindow {
 	public MainAppWindow() {
 		initialize();
 	}
+	
+	public void setDataAndInitiateConnection(String data) {
+		MainAppWindow.this.frmMainAppWindow.setEnabled(true);
+		if(data==null || data.length()==0) {
+			return;
+		}
+		this.data = data;
+		String[] dataArray = data.split(" ");
+		this.c = new ClientThread();
+		this.c.setMainServerIP(dataArray[0]);
+		this.c.setMainServerPort(Integer.parseInt(dataArray[1]));
+		this.c.setServerSidePort(Integer.parseInt(dataArray[2]));
+		this.c.setServices(dataArray[3]);
+		this.c.setTask(ClientThread.CONNECT);
+		this.client = new Thread(c);
+		this.client.start();
+		btnConnect.setEnabled(false);
+		btnDisconnect.setEnabled(true);
+	}
+	
+	public String getData() {
+		return data;
+	}
+	
+	public void closeConnection() {
+		this.c.setTask(ClientThread.DISCONNECT);
+		this.client = new Thread(c);
+		this.client.start();
+		btnConnect.setEnabled(true);
+		btnDisconnect.setEnabled(false);
+	}
 
 	/**
 	 * Initialize the contents of the frame.
@@ -74,7 +112,7 @@ public class MainAppWindow {
 	private void initialize() {
 		frmMainAppWindow = new JFrame();
 		frmMainAppWindow.setTitle("Aplikacija za distribuirano sortiranje");
-		frmMainAppWindow.setBounds(100, 100, 727, 722);
+		frmMainAppWindow.setBounds(100, 100, 727, 635);
 		frmMainAppWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmMainAppWindow.getContentPane().add(getPanelServer(), BorderLayout.NORTH);
 		frmMainAppWindow.getContentPane().add(getPanelClient(), BorderLayout.CENTER);
@@ -130,6 +168,10 @@ public class MainAppWindow {
 			btnConnect = new JButton("Prijavi se na glavni server");
 			btnConnect.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
+					ConnectionDialog dialog = new ConnectionDialog();
+					dialog.setVisible(true);
+					dialog.setParent(MainAppWindow.this);
+					MainAppWindow.this.frmMainAppWindow.setEnabled(false);
 				}
 			});
 			btnConnect.setPreferredSize(new Dimension(240, 35));
@@ -146,6 +188,11 @@ public class MainAppWindow {
 	private JButton getBtnDisconnect() {
 		if (btnDisconnect == null) {
 			btnDisconnect = new JButton("Odjavi se sa glavnog servera");
+			btnDisconnect.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					closeConnection();
+				}
+			});
 			btnDisconnect.setPreferredSize(new Dimension(240, 35));
 			btnDisconnect.setEnabled(false);
 		}
@@ -264,6 +311,16 @@ public class MainAppWindow {
 	private JButton getButton_3() {
 		if (button_3 == null) {
 			button_3 = new JButton("New button");
+			button_3.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+//					System.out.println(data);
+//					System.out.println(client.isAlive());
+					System.out.println(client.getState());
+					client.start();
+//					client.interrupt();
+//					System.out.println(client.toString());
+				}
+			});
 		}
 		return button_3;
 	}

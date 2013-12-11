@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.GridBagLayout;
@@ -23,10 +24,23 @@ public class ConnectionDialog extends JDialog {
 	 * 
 	 */
 	private static final long serialVersionUID = 6695554088633959419L;
+	
 	private final JPanel contentPanel = new JPanel();
+	
 	private JTextField txtServerIP;
 	private JTextField txtServerPort;
 	private JTextField txtListeningPort;
+	
+	private JCheckBox chbBubble = new JCheckBox("Bubble sort");
+	private JCheckBox chbSelection = new JCheckBox("Selection sort");
+	private JCheckBox chbInsertion = new JCheckBox("Insertion sort");
+	
+	private String ip = "";
+	private int serverPort;
+	private int listeningPort;
+	private String services = "";
+	
+	private MainAppWindow main;
 
 	/**
 	 * Launch the application.
@@ -35,12 +49,20 @@ public class ConnectionDialog extends JDialog {
 		try {
 			ConnectionDialog dialog = new ConnectionDialog();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setLocationRelativeTo(null);
 			dialog.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	public String returnData() {
+		return ip+" "+serverPort+" "+listeningPort+" "+services;
+	}
+	
+	public void setParent(MainAppWindow main) {
+		this.main = main;
+	}
 	/**
 	 * Create the dialog.
 	 */
@@ -50,7 +72,9 @@ public class ConnectionDialog extends JDialog {
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BorderLayout(0, 0));
-		{
+		
+		
+		
 			JPanel panel = new JPanel();
 			panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 			contentPanel.add(panel);
@@ -134,8 +158,8 @@ public class ConnectionDialog extends JDialog {
 				gbc_label.gridy = 4;
 				panel.add(label, gbc_label);
 			}
-			{
-				JCheckBox chbBubble = new JCheckBox("Bubble sort");
+			
+//				JCheckBox chbBubble = new JCheckBox("Bubble sort");
 				chbBubble.setToolTipText("Izaberite algoritme koje nudite ostalim klijentima");
 				chbBubble.setIconTextGap(10);
 				chbBubble.setHorizontalAlignment(SwingConstants.LEFT);
@@ -145,9 +169,9 @@ public class ConnectionDialog extends JDialog {
 				gbc_chbBubble.gridx = 1;
 				gbc_chbBubble.gridy = 4;
 				panel.add(chbBubble, gbc_chbBubble);
-			}
-			{
-				JCheckBox chbSelection = new JCheckBox("Selection sort");
+			
+			
+//				JCheckBox chbSelection = new JCheckBox("Selection sort");
 				chbSelection.setToolTipText("Izaberite algoritme koje nudite ostalim klijentima");
 				chbSelection.setIconTextGap(10);
 				chbSelection.setHorizontalAlignment(SwingConstants.LEFT);
@@ -157,9 +181,9 @@ public class ConnectionDialog extends JDialog {
 				gbc_chbSelection.gridx = 1;
 				gbc_chbSelection.gridy = 5;
 				panel.add(chbSelection, gbc_chbSelection);
-			}
-			{
-				JCheckBox chbInsertion = new JCheckBox("Insertion sort");
+			
+			
+//				JCheckBox chbInsertion = new JCheckBox("Insertion sort");
 				chbInsertion.setToolTipText("Izaberite algoritme koje nudite ostalim klijentima");
 				chbInsertion.setIconTextGap(10);
 				chbInsertion.setHorizontalAlignment(SwingConstants.LEFT);
@@ -168,8 +192,8 @@ public class ConnectionDialog extends JDialog {
 				gbc_chbInsertion.gridx = 1;
 				gbc_chbInsertion.gridy = 6;
 				panel.add(chbInsertion, gbc_chbInsertion);
-			}
-		}
+			
+		
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -179,6 +203,58 @@ public class ConnectionDialog extends JDialog {
 				btnOk.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						
+						if(txtServerIP.getText()==null || txtServerIP.getText().length()==0) {
+							JOptionPane.showMessageDialog(null, "Morate uneti IP adresu glavnog servera.", "Greska!", JOptionPane.ERROR_MESSAGE);
+							return;
+						} else {
+							ip = txtServerIP.getText().trim();
+						}
+						
+						if(txtServerPort.getText()==null || txtServerPort.getText().length()==0) {
+							JOptionPane.showMessageDialog(null, "Morate uneti broj porta glavnog servera.", "Greska!", JOptionPane.ERROR_MESSAGE);
+							return;
+						} else {
+							try {
+								serverPort = Integer.parseInt(txtServerPort.getText().trim());
+							} catch (NumberFormatException e2) {
+								// TODO: handle exception
+								JOptionPane.showMessageDialog(null, "Neispravno ste uneli broj porta glavnog servera.", "Greska!", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+						
+						if(txtListeningPort.getText()==null || txtListeningPort.getText().length()==0) {
+							JOptionPane.showMessageDialog(null, "Morate uneti broj porta za osluskivanje.", "Greska!", JOptionPane.ERROR_MESSAGE);
+							return;
+						} else {
+							try {
+								listeningPort = Integer.parseInt(txtListeningPort.getText().trim());
+							} catch (NumberFormatException e2) {
+								// TODO: handle exception
+								JOptionPane.showMessageDialog(null, "Neispravno ste uneli broj porta za osluskivanje.", "Greska!", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+						
+						if(!chbBubble.isSelected() && !chbSelection.isSelected() && !chbInsertion.isSelected()) {
+							JOptionPane.showMessageDialog(null, "Morate izabrati bar jedan od ponudjenih algoritama.", "Greska!", JOptionPane.ERROR_MESSAGE);
+							services = "";
+							return;
+						} else {
+							services = "";
+							if(chbBubble.isSelected()) {
+								services = services + "B";
+							}
+							if(chbSelection.isSelected()) {
+								services = services + "S";
+							}
+							if(chbInsertion.isSelected()) {
+								services = services + "I";
+							}
+							System.out.println(services);
+							main.setDataAndInitiateConnection(returnData().trim());
+							dispose();
+						}
 					}
 				});
 				btnOk.setActionCommand("OK");
@@ -187,6 +263,12 @@ public class ConnectionDialog extends JDialog {
 			}
 			{
 				JButton btnCancel = new JButton("Ponisti");
+				btnCancel.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						main.setDataAndInitiateConnection("");
+						dispose();
+					}
+				});
 				btnCancel.setActionCommand("Cancel");
 				buttonPane.add(btnCancel);
 			}

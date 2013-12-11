@@ -2,10 +2,8 @@ package client;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.GregorianCalendar;
 
 import protocol.DSPClient;
@@ -15,6 +13,13 @@ public class ClientThread implements Runnable {
 	private Socket mainServer;
 //	private Socket sServer1;
 //	private Socket sServer2;
+	private DSPClient protocol;
+	
+	public static final int CONNECT = 1;
+	public static final int ASK_FOR_PEERS = 2;
+	public static final int FINISHED = 3;
+	public static final int DISCONNECT = 4;
+	private int task = 0;
 	
 	private int mainServerPort;
 	private String mainServerIP;
@@ -32,8 +37,14 @@ public class ClientThread implements Runnable {
 		this.mainServerIP = mainServerIP;
 		this.mainServerPort = mainServerPort;
 	}
-	
-	
+
+	public int getTask() {
+		return task;
+	}
+
+	public void setTask(int task) {
+		this.task = task;
+	}
 
 	public int getMainServerPort() {
 		return mainServerPort;
@@ -79,60 +90,170 @@ public class ClientThread implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 		
+//		try {
+//			
+//			this.mainServer = new Socket(getMainServerIP(), getMainServerPort());
+//			DSPClient protocol = new DSPClient();
+//			
+//			BufferedReader mainServerInput = new BufferedReader(new InputStreamReader(this.mainServer.getInputStream()));
+//			DataOutputStream mainServerOutput = new DataOutputStream(this.mainServer.getOutputStream());
+//			
+////			while(!this.connectionTerminated) {
+//				
+//				String request = protocol.connectToMainServer(getServices(), getServerSidePort());
+//				mainServerOutput.writeBytes(request);
+//				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za prijavu glavnom serveru: "+request);
+//				
+//				String serverResponse = mainServerInput.readLine();
+//				int responseCode = protocol.parseProtocolMessage(serverResponse);
+//				
+//				switch(responseCode) {
+//				
+//					case DSPClient.ACCEPTED: {
+//						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste prijavljeni! Server: "+serverResponse);
+//					}
+//					break;
+//					
+//					case DSPClient.PEERS: {
+//						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+//					}	
+//					break;
+//					
+//					case DSPClient.ERROR: {
+//						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse);
+//					}
+//					break;
+//					
+//					case DSPClient.NOT_FOUND: {
+//						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server nije pronasao odgovarajuce klijente: "+serverResponse);
+//					}
+//					
+//					default: {
+//						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+//					}
+//				}
+//				
+//				
+////			}
+////			mainServerInput.close();
+////			mainServerOutput.close();
+////			mainServer.close();
+//		} catch (UnknownHostException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+		switch(getTask()) {
+			
+			case ClientThread.CONNECT: {
+				connectToMainServer();
+			}
+			break;
+			
+			case ClientThread.DISCONNECT: {
+				disconnectFromMainServer();
+			}
+		}
+		
+	}
+	
+	private void connectToMainServer() {
+		
 		try {
 			
 			this.mainServer = new Socket(getMainServerIP(), getMainServerPort());
-			DSPClient protocol = new DSPClient();
+			this.protocol = new DSPClient();
 			
 			BufferedReader mainServerInput = new BufferedReader(new InputStreamReader(this.mainServer.getInputStream()));
 			DataOutputStream mainServerOutput = new DataOutputStream(this.mainServer.getOutputStream());
 			
-//			while(!this.connectionTerminated) {
-				
-				String request = protocol.connectToMainServer(getServices(), getServerSidePort());
-				mainServerOutput.writeBytes(request);
-				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za prijavu glavnom serveru: "+request);
-				
-				String serverResponse = mainServerInput.readLine();
-				int responseCode = protocol.parseProtocolMessage(serverResponse);
-				
-				switch(responseCode) {
-				
-					case DSPClient.ACCEPTED: {
-						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste prijavljeni! Server: "+serverResponse);
-					}
-					break;
-					
-					case DSPClient.PEERS: {
-						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
-					}	
-					break;
-					
-					case DSPClient.ERROR: {
-						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse);
-					}
-					break;
-					
-					case DSPClient.NOT_FOUND: {
-						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server nije pronasao odgovarajuce klijente: "+serverResponse);
-					}
-					
-					default: {
-						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
-					}
-				}
-				
-				
+			String request = this.protocol.connectToMainServer(getServices(), getServerSidePort());
+			mainServerOutput.writeBytes(request);
+			System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za prijavu glavnom serveru: "+request);
+			
+			String serverResponse = mainServerInput.readLine();
+			int responseCode = this.protocol.parseProtocolMessage(serverResponse);
+			
+			switch(responseCode) {
+			
+			case DSPClient.ACCEPTED: {
+				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste prijavljeni! Server: "+serverResponse);
+			}
+			break;
+			
+//			case DSPClient.PEERS: {
+//				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+//			}	
+//			break;
+			
+			case DSPClient.ERROR: {
+				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse);
+			}
+			break;
+			
+//			case DSPClient.NOT_FOUND: {
+//				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server nije pronasao odgovarajuce klijente: "+serverResponse);
 //			}
-			mainServer.close();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			break;
+			
+			default: {
+				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+			}
 		}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
+	private void disconnectFromMainServer() {
 		
+		try {
+			
+			BufferedReader mainServerInput = new BufferedReader(new InputStreamReader(this.mainServer.getInputStream()));
+			DataOutputStream mainServerOutput = new DataOutputStream(this.mainServer.getOutputStream());
+			
+			String request = this.protocol.sayGoodbye();
+			mainServerOutput.writeBytes(request);
+			System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za prijavu glavnom serveru: "+request);
+			
+			String serverResponse = mainServerInput.readLine();
+			int responseCode = this.protocol.parseProtocolMessage(serverResponse);
+			
+			switch(responseCode) {
+						
+						case DSPClient.DISCONNECT: {
+							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste odjavljeni! Server: "+serverResponse);
+							mainServerInput.close();
+							mainServerOutput.close();
+							this.mainServer.close();
+						}
+						break;
+						
+			//			case DSPClient.PEERS: {
+			//				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+			//			}	
+			//			break;
+						
+						case DSPClient.ERROR: {
+							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse);
+						}
+						break;
+						
+			//			case DSPClient.NOT_FOUND: {
+			//				System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server nije pronasao odgovarajuce klijente: "+serverResponse);
+			//			}
+			//			break;
+						
+						default: {
+							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+						}
+					}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
 	
 	private int[] parseDataToArray(String dataString) {
