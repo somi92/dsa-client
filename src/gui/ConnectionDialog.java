@@ -42,6 +42,13 @@ public class ConnectionDialog extends JDialog {
 	
 	private MainAppWindow main;
 
+	public int getListeningPort() {
+		return this.listeningPort;
+	}
+	
+	public void setListeningPort(int listeningPort) {
+		this.listeningPort = listeningPort;
+	}
 	/**
 	 * Launch the application.
 	 */
@@ -56,8 +63,10 @@ public class ConnectionDialog extends JDialog {
 		}
 	}
 
-	public String returnData() {
-		return ip+" "+serverPort+" "+listeningPort+" "+services;
+	public String[] returnData() {
+//		return ip+" "+serverPort+" "+listeningPort+" "+services;
+		String[] data = {ip,serverPort+"",listeningPort+"",services};
+		return data;
 	}
 	
 	public void setParent(MainAppWindow main) {
@@ -251,8 +260,15 @@ public class ConnectionDialog extends JDialog {
 							if(chbInsertion.isSelected()) {
 								services = services + "I";
 							}
-							System.out.println(services);
-							main.setDataAndInitiateConnection(returnData().trim());
+							services.trim();
+//							System.out.println(services);
+							int code = main.startSortingServer(getListeningPort());
+							if(code==-1) {
+								return;
+							} else {
+								setListeningPort(code);
+							}
+							main.setDataAndInitiateConnection(returnData());
 							dispose();
 						}
 					}
@@ -265,7 +281,8 @@ public class ConnectionDialog extends JDialog {
 				JButton btnCancel = new JButton("Ponisti");
 				btnCancel.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						main.setDataAndInitiateConnection("");
+						String[] data = null;
+						main.setDataAndInitiateConnection(data);
 						dispose();
 					}
 				});

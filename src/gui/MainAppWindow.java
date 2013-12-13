@@ -21,12 +21,15 @@ import javax.swing.JComboBox;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import sorting_server.SortingServerMainThread;
+
 import client.ClientThread;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class MainAppWindow {
 
@@ -50,8 +53,10 @@ public class MainAppWindow {
 	private JTextArea txtLog;
 
 //	private Thread client;
-	private Executor clientExecutor = Executors.newSingleThreadExecutor();
+//	private Executor clientExecutor = Executors.newSingleThreadExecutor();
+	private ExecutorService threadsExecutor;
 	private ClientThread client;
+	private SortingServerMainThread sortingServer;
 	
 	private String data = "";
 	private JPanel panel;
@@ -79,22 +84,32 @@ public class MainAppWindow {
 		initialize();
 	}
 	
-	public void setDataAndInitiateConnection(String data) {
+	public void setDataAndInitiateConnection(String[] data) {
 		MainAppWindow.this.frmMainAppWindow.setEnabled(true);
-		if(data==null || data.length()==0) {
+		if(data==null || data.length<4) {
 			return;
 		}
-		this.data = data;
-		String[] dataArray = data.split(" ");
+		this.threadsExecutor = Executors.newFixedThreadPool(2);
+		this.threadsExecutor.execute(sortingServer);
+//		this.data = data[0]+data[1]+data[2]+data[3];
+//		String[] dataArray = data.split(" ");
 		this.client = new ClientThread(MainAppWindow.this);
-		this.client.setMainServerIP(dataArray[0]);
-		this.client.setMainServerPort(Integer.parseInt(dataArray[1]));
-		this.client.setServerSidePort(Integer.parseInt(dataArray[2]));
-		this.client.setServices(dataArray[3]);
+//		this.client.setMainServerIP(dataArray[0]);
+//		this.client.setMainServerPort(Integer.parseInt(dataArray[1]));
+//		this.client.setServerSidePort(Integer.parseInt(dataArray[2]));
+//		this.client.setServices(dataArray[3]);
+		
+		this.client.setMainServerIP(data[0]);
+		this.client.setMainServerPort(Integer.parseInt(data[1]));
+		this.client.setServerSidePort(Integer.parseInt(data[2]));
+		this.client.setServices(data[3]);
+		
+//		this.sortingServerListeningPort = Integer.parseInt(data[2]);
+		
 		this.client.setTask(ClientThread.CONNECT);
 //		this.client = new Thread(c);
 //		this.client.start();
-		this.clientExecutor.execute(client);
+		this.threadsExecutor.execute(client);
 //		btnConnect.setEnabled(false);
 //		btnDisconnect.setEnabled(true);
 	}
@@ -117,14 +132,28 @@ public class MainAppWindow {
 		this.client.setTask(ClientThread.DISCONNECT);
 //		this.client = new Thread(c);
 //		this.client.start();
-		this.clientExecutor.execute(client);
+		this.threadsExecutor.execute(client);
 //		btnConnect.setEnabled(true);
 //		btnDisconnect.setEnabled(false);
+		this.threadsExecutor.shutdownNow();
+		try {
+			this.threadsExecutor.awaitTermination(500, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("GOTOVO!!!");
 	}
 	
 	public void updateLog(StringBuffer data) {
 //		txtLog.setText(data.toString());
 		txtLog.append(data.toString());
+	}
+	
+	public int startSortingServer(int sortingServerListeningPort) {
+		this.sortingServer = new SortingServerMainThread();
+		int code = this.sortingServer.startMainSortingServer(sortingServerListeningPort);
+		return code;
 	}
 
 	/**
