@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JOptionPane;
 
@@ -13,6 +14,8 @@ public class SortingServerMainThread implements Runnable {
 	private ServerSocket mainServer;
 	
 	private ExecutorService mainServerExecutor;
+	
+	private final AtomicReference<Thread> currentThread = new AtomicReference<Thread>();
 	
 	public SortingServerMainThread() {
 		
@@ -58,28 +61,38 @@ public class SortingServerMainThread implements Runnable {
 			return -1;
 		}
 	}
+	
+	public void stopMainSortingServer() {
+		try {
+			this.mainServer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+//			e.printStackTrace();
+			System.out.println("Catch u stop.");
+		}
+	}
 
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 		System.out.println("In method run of main sorting server.");
 		this.mainServerExecutor = Executors.newFixedThreadPool(10);
+		
+		currentThread.set(Thread.currentThread());
+		
 		while(true) {
 			try {
 //				if(Thread.currentThread().isInterrupted()) {
 //					System.out.println("Main SS interupted!!!");
 //					break;
 //				}
-				Thread.sleep(5);
+//				Thread.sleep(5);
 				this.mainServerExecutor.execute(new SortingServerThread(this.mainServer.accept()));
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 //				e.printStackTrace();
-				System.out.println("Main SS interupted!!!");
+				System.out.println("Catch u run!");
 				return;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 	}

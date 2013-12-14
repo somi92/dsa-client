@@ -136,13 +136,15 @@ public class MainAppWindow {
 //		btnConnect.setEnabled(true);
 //		btnDisconnect.setEnabled(false);
 		this.threadsExecutor.shutdownNow();
+		this.sortingServer.stopMainSortingServer();
 		try {
-			this.threadsExecutor.awaitTermination(500, TimeUnit.MILLISECONDS);
+			boolean r = this.threadsExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
+			System.out.println(r);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("GOTOVO!!!");
+//		System.out.println("GOTOVO!!!");
 	}
 	
 	public void updateLog(StringBuffer data) {
