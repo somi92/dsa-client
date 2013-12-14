@@ -131,7 +131,7 @@ public class MainAppWindow {
 	public void closeConnection() {
 		this.client.setTask(ClientThread.DISCONNECT);
 		this.threadsExecutor.execute(client);
-		this.threadsExecutor.shutdownNow();
+		this.threadsExecutor.shutdown();
 		this.sortingServer.stopMainSortingServer();
 		try {
 			boolean r = this.threadsExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
@@ -144,6 +144,7 @@ public class MainAppWindow {
 	
 	public void updateLog(StringBuffer data) {
 		txtLog.append(data.toString());
+		txtLog.setCaretPosition(txtLog.getText().length());
 	}
 	
 	public int startSortingServer(int sortingServerListeningPort) {

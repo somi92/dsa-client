@@ -106,6 +106,7 @@ public class ConnectionDialog extends JDialog {
 			}
 			{
 				txtServerIP = new JTextField();
+				txtServerIP.setText("localhost");
 				txtServerIP.setToolTipText("IP adresa glavnog servera");
 				txtServerIP.setColumns(10);
 				GridBagConstraints gbc_txtServerIP = new GridBagConstraints();
@@ -128,6 +129,7 @@ public class ConnectionDialog extends JDialog {
 			}
 			{
 				txtServerPort = new JTextField();
+				txtServerPort.setText("8090");
 				txtServerPort.setToolTipText("Port glavnog servera potreban za prijavu");
 				txtServerPort.setColumns(10);
 				GridBagConstraints gbc_txtServerPort = new GridBagConstraints();
@@ -149,6 +151,7 @@ public class ConnectionDialog extends JDialog {
 			}
 			{
 				txtListeningPort = new JTextField();
+				txtListeningPort.setText("0");
 				txtListeningPort.setToolTipText("Port koji koriste drugi klijenti za zahtevanje usluga sortiranja - unesite nula ukoliko zelite da program automatski izabere slobodan port");
 				txtListeningPort.setColumns(10);
 				GridBagConstraints gbc_txtListeningPort = new GridBagConstraints();
@@ -167,6 +170,7 @@ public class ConnectionDialog extends JDialog {
 				gbc_label.gridy = 4;
 				panel.add(label, gbc_label);
 			}
+				chbBubble.setSelected(true);
 			
 //				JCheckBox chbBubble = new JCheckBox("Bubble sort");
 				chbBubble.setToolTipText("Izaberite algoritme koje nudite ostalim klijentima");
