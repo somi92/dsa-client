@@ -130,11 +130,7 @@ public class MainAppWindow {
 	
 	public void closeConnection() {
 		this.client.setTask(ClientThread.DISCONNECT);
-//		this.client = new Thread(c);
-//		this.client.start();
 		this.threadsExecutor.execute(client);
-//		btnConnect.setEnabled(true);
-//		btnDisconnect.setEnabled(false);
 		this.threadsExecutor.shutdownNow();
 		this.sortingServer.stopMainSortingServer();
 		try {
@@ -144,11 +140,9 @@ public class MainAppWindow {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		System.out.println("GOTOVO!!!");
 	}
 	
 	public void updateLog(StringBuffer data) {
-//		txtLog.setText(data.toString());
 		txtLog.append(data.toString());
 	}
 	
