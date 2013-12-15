@@ -103,6 +103,7 @@ public class MainAppWindow {
 		this.client.setMainServerPort(Integer.parseInt(data[1]));
 		this.client.setServerSidePort(Integer.parseInt(data[2]));
 		this.client.setServices(data[3]);
+		this.sortingServer.setServices(data[3]);
 		
 //		this.sortingServerListeningPort = Integer.parseInt(data[2]);
 		
@@ -117,6 +118,8 @@ public class MainAppWindow {
 	public void manageButtons() {
 		btnConnect.setEnabled(!btnConnect.isEnabled());
 		btnDisconnect.setEnabled(!btnDisconnect.isEnabled());
+		btnSort.setEnabled(!btnSort.isEnabled());
+		txtArray.setEnabled(!txtArray.isEnabled());
 		if(btnConnect.isEnabled()) {
 			lblStatus.setText("Niste prijavljeni na glavni server.");
 		} else {

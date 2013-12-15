@@ -21,7 +21,7 @@ public class ClientThread implements Runnable {
 	private MainAppWindow parent;
 	
 	public static final int CONNECT = 1;
-	public static final int ASK_FOR_PEERS = 2;
+	public static final int SORT = 2;
 	public static final int FINISHED = 3;
 	public static final int DISCONNECT = 4;
 	private int task = 0;
@@ -288,31 +288,31 @@ public class ClientThread implements Runnable {
 		}
 	}
 	
-	private int[] parseDataToArray(String dataString) {
-		int[] data;
-		String[] dArray = dataString.split(",");
-		data = new int[dArray.length];
-		for(int i=0; i<data.length; i++) {
-			data[i] = Integer.parseInt(dArray[i]);
-		}
-		return data;
-	}
-	
-	private String parseDataToString(int[] dataArray) {
-		String data = "";
-		for(int i=0; i<dataArray.length; i++) {
-			data = data + dataArray[i] + ",";
-		}
-		return data.substring(0, data.length()-1);
-	}
-	
-	private boolean isSorted(int[] data) {
-		for(int i=0; i<data.length-1; i++) {
-			if(data[i] > data[i+1]) {
-				return false;
-			}
-		}
-		return true;
-	}
+//	private int[] parseDataToArray(String dataString) {
+//		int[] data;
+//		String[] dArray = dataString.split(",");
+//		data = new int[dArray.length];
+//		for(int i=0; i<data.length; i++) {
+//			data[i] = Integer.parseInt(dArray[i]);
+//		}
+//		return data;
+//	}
+//	
+//	private String parseDataToString(int[] dataArray) {
+//		String data = "";
+//		for(int i=0; i<dataArray.length; i++) {
+//			data = data + dataArray[i] + ",";
+//		}
+//		return data.substring(0, data.length()-1);
+//	}
+//	
+//	private boolean isSorted(int[] data) {
+//		for(int i=0; i<data.length-1; i++) {
+//			if(data[i] > data[i+1]) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 
 }

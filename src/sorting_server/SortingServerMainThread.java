@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 public class SortingServerMainThread implements Runnable {
 
 	private int listeningPort;
+	private String services;
 	private ServerSocket mainServer;
 	
 	private ExecutorService mainServerExecutor;
@@ -27,6 +28,14 @@ public class SortingServerMainThread implements Runnable {
 
 	public void setListeningPort(int listeningPort) {
 		this.listeningPort = listeningPort;
+	}
+	
+	public String getServices() {
+		return services;
+	}
+	
+	public void setServices(String services) {
+		this.services = services;
 	}
 
 	public ServerSocket getMainServer() {
@@ -72,7 +81,7 @@ public class SortingServerMainThread implements Runnable {
 		this.mainServerExecutor = Executors.newFixedThreadPool(10);
 		while(true) {
 			try {
-				this.mainServerExecutor.execute(new SortingServerThread(this.mainServer.accept()));
+				this.mainServerExecutor.execute(new SortingServerThread(this.mainServer.accept(), getServices()));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 //				System.out.println("Catch in run!");
