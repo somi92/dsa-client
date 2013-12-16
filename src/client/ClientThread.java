@@ -32,6 +32,8 @@ public class ClientThread implements Runnable {
 	private String mainServerIP;
 	private String services;
 	private int serverSidePort;
+	private String algorithm;
+	private String data;
 	
 	private StringBuffer log = new StringBuffer("");
 	
@@ -89,6 +91,22 @@ public class ClientThread implements Runnable {
 
 	public void setServerSidePort(int serverSidePort) {
 		this.serverSidePort = serverSidePort;
+	}
+
+	public String getAlgorithm() {
+		return algorithm;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setAlgorithm(String algorithm) {
+		this.algorithm = algorithm;
+	}
+
+	public void setData(String data) {
+		this.data = data;
 	}
 
 	public boolean isConnectionTerminated() {
@@ -166,9 +184,15 @@ public class ClientThread implements Runnable {
 			}
 			break;
 			
+			case ClientThread.SORT: {
+				startSortingSession();
+			}
+			break;
+			
 			case ClientThread.DISCONNECT: {
 				disconnectFromMainServer();
 			}
+			break;
 		}
 		
 	}
@@ -290,9 +314,12 @@ public class ClientThread implements Runnable {
 		}
 	}
 	
-	public void startSortingSession(String algorithm, String data) {
+	private void startSortingSession() {
 		
 		try {
+			String algorithm = getAlgorithm();
+			protocol.setData(getData());
+			String data = protocol.getData();
 			BufferedReader mainServerInput = new BufferedReader(new InputStreamReader(this.mainServer.getInputStream()));
 			DataOutputStream mainServerOutput = new DataOutputStream(this.mainServer.getOutputStream());
 			
@@ -320,6 +347,7 @@ public class ClientThread implements Runnable {
 //						break;
 						
 						case DSPClient.PEERS: {
+							
 //							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server je pronasao odgovarajuce sorting servere: "+serverResponse);
 							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server je pronasao odgovarajuce sorting servere: "+serverResponse+'\n');
 							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Zapocinje proces sortiranja, povezivanje sa sorting serverima..."+'\n');
@@ -333,10 +361,12 @@ public class ClientThread implements Runnable {
 							
 							if(adresses.length == 1) {
 								// pronadjen samo jedan klijent
+								System.out.println("Adresa servera 1: "+adresses[0]);
 								server1 = adresses[0].substring(0, adresses[0].indexOf(":"));
 								server1Port = Integer.parseInt(adresses[0].substring(adresses[0].indexOf(":")+1));
 								
 								this.sortingServer1 = new Socket(server1, server1Port);
+								this.sortingServer2 = null;
 							} else {
 								server1 = adresses[0].substring(0, adresses[0].indexOf(":"));
 								server1Port = Integer.parseInt(adresses[0].substring(adresses[0].indexOf(":")+1));
@@ -348,7 +378,96 @@ public class ClientThread implements Runnable {
 								this.sortingServer2 = new Socket(server2, server2Port);
 							}
 							
+							BufferedReader server1Input = new BufferedReader(new InputStreamReader(this.sortingServer1.getInputStream()));
+							BufferedReader server2Input = null;
+							DataOutputStream server1Output = new DataOutputStream(this.sortingServer1.getOutputStream());
+							DataOutputStream server2Output = null;
 							
+							if(this.sortingServer2 != null) {
+								server2Input = new BufferedReader(new InputStreamReader(this.sortingServer2.getInputStream()));
+								server2Output = new DataOutputStream(this.sortingServer2.getOutputStream());
+							}
+							
+							int iteration = 0;
+							int response = 0;
+							String sortRequest = "";
+							String answer = "";
+							
+							while(!isSorted(parseDataToArray(data))) {
+							
+								sortRequest = protocol.generateSortRequest(protocol.getData(), iteration);
+								server1Output.writeBytes(sortRequest);
+								answer = server1Input.readLine();
+								response = protocol.parseProtocolMessage(answer);
+								
+								if(response == DSPClient.ERROR || response == DSPClient.NOT_SUPPORTED) {
+									this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server "+adresses[0]+" nije u mogucnosti da izvrsi sortiranje: "+answer+'\n');
+									this.parent.updateLog(this.log);
+									break;
+								} else if(response == DSPClient.FINISHED) {
+									this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server "+adresses[0]+" je uradio "+(iteration+1)+". iteraciju sortiranja "+answer+'\n');
+									this.parent.updateLog(this.log);
+								}
+								
+								if(isSorted(parseDataToArray(protocol.getData()))) {
+									this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Obavestiti glavni server, sortiranje je zavrseno: "+answer+'\n');
+									this.parent.updateLog(this.log);
+									server1Output.writeBytes(protocol.sayGoodbye());
+									if(this.sortingServer2 != null) {
+										server2Output.writeBytes(protocol.sayGoodbye());
+									}
+									mainServerOutput.writeBytes(protocol.finishedSorting());
+									answer = mainServerInput.readLine();
+									this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Odgovor glavnog servera: "+answer+'\n');
+									this.parent.updateLog(this.log);
+									break;
+								}
+								
+								iteration++;
+								
+								if(this.sortingServer2 != null) {
+									
+									sortRequest = protocol.generateSortRequest(protocol.getData(), iteration);
+									server2Output.writeBytes(sortRequest);
+									answer = server2Input.readLine();
+									response = protocol.parseProtocolMessage(answer);
+									
+									if(response == DSPClient.ERROR || response == DSPClient.NOT_SUPPORTED) {
+										this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server "+adresses[1]+" nije u mogucnosti da izvrsi sortiranje: "+answer+'\n');
+										this.parent.updateLog(this.log);
+										break;
+									} else if(response == DSPClient.FINISHED) {
+										this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server "+adresses[1]+" je uradio "+(iteration+1)+". iteraciju sortiranja "+answer+'\n');
+										this.parent.updateLog(this.log);
+									}
+									
+									if(isSorted(parseDataToArray(protocol.getData()))) {
+										this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Obavestiti glavni server, sortiranje je zavrseno: "+answer+'\n');
+										this.parent.updateLog(this.log);
+										server1Output.writeBytes(protocol.sayGoodbye());
+										server2Output.writeBytes(protocol.sayGoodbye());
+										mainServerOutput.writeBytes(protocol.finishedSorting());
+										answer = mainServerInput.readLine();
+										this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Odgovor glavnog servera: "+answer+'\n');
+										this.parent.updateLog(this.log);
+										break;
+									}
+									
+									iteration++;
+									
+								}
+								
+							}
+							
+							server1Input.close();
+							server1Output.close();
+							this.sortingServer1.close();
+							
+							if(this.sortingServer2 != null) {
+								server2Input.close();
+								server2Output.close();
+								this.sortingServer2.close();
+							}
 						}	
 						break;
 						
@@ -379,6 +498,7 @@ public class ClientThread implements Runnable {
 			} catch (Exception e) {
 					// TODO: handle exception
 					JOptionPane.showMessageDialog(null, e.getMessage(), "Greska!", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
 				}
 	}
 
@@ -387,16 +507,16 @@ public class ClientThread implements Runnable {
 //		
 //	}
 	
-//	private int[] parseDataToArray(String dataString) {
-//		int[] data;
-//		String[] dArray = dataString.split(",");
-//		data = new int[dArray.length];
-//		for(int i=0; i<data.length; i++) {
-//			data[i] = Integer.parseInt(dArray[i]);
-//		}
-//		return data;
-//	}
-//	
+	private int[] parseDataToArray(String dataString) {
+		int[] data;
+		String[] dArray = dataString.split(",");
+		data = new int[dArray.length];
+		for(int i=0; i<data.length; i++) {
+			data[i] = Integer.parseInt(dArray[i]);
+		}
+		return data;
+	}
+	
 //	private String parseDataToString(int[] dataArray) {
 //		String data = "";
 //		for(int i=0; i<dataArray.length; i++) {
@@ -404,14 +524,14 @@ public class ClientThread implements Runnable {
 //		}
 //		return data.substring(0, data.length()-1);
 //	}
-//	
-//	private boolean isSorted(int[] data) {
-//		for(int i=0; i<data.length-1; i++) {
-//			if(data[i] > data[i+1]) {
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
+	
+	private boolean isSorted(int[] data) {
+		for(int i=0; i<data.length-1; i++) {
+			if(data[i] > data[i+1]) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 }

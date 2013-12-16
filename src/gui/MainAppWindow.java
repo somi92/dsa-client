@@ -120,6 +120,7 @@ public class MainAppWindow {
 		btnDisconnect.setEnabled(!btnDisconnect.isEnabled());
 		btnSort.setEnabled(!btnSort.isEnabled());
 		txtArray.setEnabled(!txtArray.isEnabled());
+		cmbSort.setEnabled(!cmbSort.isEnabled());
 		if(btnConnect.isEnabled()) {
 			lblStatus.setText("Niste prijavljeni na glavni server.");
 		} else {
@@ -154,6 +155,13 @@ public class MainAppWindow {
 		this.sortingServer = new SortingServerMainThread();
 		int code = this.sortingServer.startMainSortingServer(sortingServerListeningPort);
 		return code;
+	}
+	
+	public void startSorting(String algorithm, String data) {
+		this.client.setTask(ClientThread.SORT);
+		this.client.setAlgorithm(algorithm);
+		this.client.setData(data);
+		this.threadsExecutor.execute(client);
 	}
 
 	/**
@@ -302,6 +310,21 @@ public class MainAppWindow {
 	private JButton getBtnSort() {
 		if (btnSort == null) {
 			btnSort = new JButton("Sortiraj");
+			btnSort.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					String algorithm = "";
+					if(cmbSort.getSelectedIndex() == 0) {
+						algorithm = "B";
+					}
+					if(cmbSort.getSelectedIndex() == 1) {
+						algorithm = "S";
+					}
+					if(cmbSort.getSelectedIndex() == 2) {
+						algorithm = "I";
+					}
+					startSorting(algorithm, txtArray.getText().trim());
+				}
+			});
 			btnSort.setToolTipText("Unesite niz koji zelite da sortirate");
 			btnSort.setEnabled(false);
 		}
