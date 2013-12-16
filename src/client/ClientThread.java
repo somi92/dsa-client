@@ -14,6 +14,8 @@ import protocol.DSPClient;
 public class ClientThread implements Runnable {
 
 	private Socket mainServer;
+	private Socket sortingServer1;
+	private Socket sortingServer2;
 //	private Socket sServer1;
 //	private Socket sServer2;
 	private DSPClient protocol;
@@ -287,6 +289,103 @@ public class ClientThread implements Runnable {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Greska!", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	
+	public void startSortingSession(String algorithm, String data) {
+		
+		try {
+			BufferedReader mainServerInput = new BufferedReader(new InputStreamReader(this.mainServer.getInputStream()));
+			DataOutputStream mainServerOutput = new DataOutputStream(this.mainServer.getOutputStream());
+			
+			String request = this.protocol.askForPeers(algorithm);
+			mainServerOutput.writeBytes(request);
+	//		System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat zahtev za prijavu glavnom serveru: "+request);
+			this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Poslat upit za sorting servere glavnom serveru, : "+request);
+			this.parent.updateLog(this.log);
+			
+			String serverResponse = mainServerInput.readLine();
+			int responseCode = this.protocol.parseProtocolMessage(serverResponse);
+			
+		
+			switch(responseCode) {
+						
+//						case DSPClient.DISCONNECT: {
+//	//						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste odjavljeni! Server: "+serverResponse);
+//							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Uspesno ste odjavljeni! Server: "+serverResponse+'\n');
+//							mainServerInput.close();
+//							mainServerOutput.close();
+//							this.mainServer.close();
+//							this.parent.updateLog(this.log);
+//							this.parent.manageButtons();
+//						}
+//						break;
+						
+						case DSPClient.PEERS: {
+//							System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server je pronasao odgovarajuce sorting servere: "+serverResponse);
+							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server je pronasao odgovarajuce sorting servere: "+serverResponse+'\n');
+							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Zapocinje proces sortiranja, povezivanje sa sorting serverima..."+'\n');
+							this.parent.updateLog(this.log);
+							
+							String[] adresses = protocol.getAddresses();
+							String server1;
+							int server1Port;
+							String server2;
+							int server2Port;
+							
+							if(adresses.length == 1) {
+								// pronadjen samo jedan klijent
+								server1 = adresses[0].substring(0, adresses[0].indexOf(":"));
+								server1Port = Integer.parseInt(adresses[0].substring(adresses[0].indexOf(":")+1));
+								
+								this.sortingServer1 = new Socket(server1, server1Port);
+							} else {
+								server1 = adresses[0].substring(0, adresses[0].indexOf(":"));
+								server1Port = Integer.parseInt(adresses[0].substring(adresses[0].indexOf(":")+1));
+								
+								server2 = adresses[1].substring(0, adresses[1].indexOf(":"));
+								server2Port = Integer.parseInt(adresses[1].substring(adresses[1].indexOf(":")+1));
+								
+								this.sortingServer1 = new Socket(server1, server1Port);
+								this.sortingServer2 = new Socket(server2, server2Port);
+							}
+							
+							
+						}	
+						break;
+						
+						case DSPClient.ERROR: {
+	//						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse);
+							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server prijavljuje gresku: "+serverResponse+'\n');
+							this.parent.updateLog(this.log);
+							return;
+						}
+//						break;
+						
+						case DSPClient.NOT_FOUND: {
+	//						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server nije pronasao odgovarajuce sorting servere: "+serverResponse);
+							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server nije pronasao odgovarajuce sorting servere: "+serverResponse+'\n');
+							this.parent.updateLog(this.log);
+							return;
+						}
+//						break;
+						
+						default: {
+	//						System.out.println("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse);
+							this.log = new StringBuffer("(vreme: "+(new GregorianCalendar()).getTime()+") "+" Server: "+serverResponse+'\n');
+							this.parent.updateLog(this.log);
+							return;
+						}
+						
+					}
+			} catch (Exception e) {
+					// TODO: handle exception
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Greska!", JOptionPane.ERROR_MESSAGE);
+				}
+	}
+
+	
+//	private void startSorting(String) {
+//		
+//	}
 	
 //	private int[] parseDataToArray(String dataString) {
 //		int[] data;
