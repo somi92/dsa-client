@@ -64,7 +64,6 @@ public class ConnectionDialog extends JDialog {
 	}
 
 	public String[] returnData() {
-//		return ip+" "+serverPort+" "+listeningPort+" "+services;
 		String[] data = {ip,serverPort+"",listeningPort+"",services};
 		return data;
 	}
@@ -265,7 +264,6 @@ public class ConnectionDialog extends JDialog {
 								services = services + "I";
 							}
 							services.trim();
-//							System.out.println(services);
 							int code = main.startSortingServer(getListeningPort());
 							if(code==-1) {
 								return;

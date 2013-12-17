@@ -13,7 +13,6 @@ public class DSPClient {
 	
 	private int state;
 	private String[] addresses;
-//	private int port;
 	private String services;
 	private String requests;
 	private String data;
@@ -38,14 +37,6 @@ public class DSPClient {
 	public void setAddresses(String[] addresses) {
 		this.addresses = addresses;
 	}
-
-//	public int getPort() {
-//		return port;
-//	}
-//	
-//	public void setPort(int port) {
-//		this.port = port;
-//	}
 	
 	public String getServices() {
 		return services;

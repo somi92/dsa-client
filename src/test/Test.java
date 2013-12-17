@@ -1,10 +1,5 @@
 package test;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-
-import client.ClientThread;
-
 public class Test {
 
 	/**
@@ -34,20 +29,20 @@ public class Test {
 //		}
 //		System.out.println("Sorted: "+sorted);
 		
-		ClientThread c = new ClientThread("localhost", 8090);
-		c.setServices("BSI");
-		
-		try {
-			ServerSocket ss = new ServerSocket(0);
-			c.setServerSidePort(ss.getLocalPort());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		Thread t = new Thread(c);
-		
-		t.start();
+//		ClientThread c = new ClientThread("localhost", 8090);
+//		c.setServices("BSI");
+//		
+//		try {
+//			ServerSocket ss = new ServerSocket(0);
+//			c.setServerSidePort(ss.getLocalPort());
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		Thread t = new Thread(c);
+//		
+//		t.start();
 	}
 
 }

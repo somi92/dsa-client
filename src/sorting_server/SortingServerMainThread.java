@@ -54,7 +54,7 @@ public class SortingServerMainThread implements Runnable {
 			} else {
 				setListeningPort(listeningPort);
 			}
-			System.out.println("Sorting server osluskuje na portu: "+this.mainServer.getLocalPort());
+//			System.out.println("Sorting server osluskuje na portu: "+this.mainServer.getLocalPort());
 			return getListeningPort();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import java.awt.Dimension;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -29,7 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.TimeUnit;
 
 public class MainAppWindow {
 
@@ -52,8 +53,6 @@ public class MainAppWindow {
 	private JButton button_3;
 	private JTextArea txtLog;
 
-//	private Thread client;
-//	private Executor clientExecutor = Executors.newSingleThreadExecutor();
 	private ExecutorService threadsExecutor;
 	private ClientThread client;
 	private SortingServerMainThread sortingServer;
@@ -91,13 +90,7 @@ public class MainAppWindow {
 		}
 		this.threadsExecutor = Executors.newFixedThreadPool(2);
 		this.threadsExecutor.execute(sortingServer);
-//		this.data = data[0]+data[1]+data[2]+data[3];
-//		String[] dataArray = data.split(" ");
 		this.client = new ClientThread(MainAppWindow.this);
-//		this.client.setMainServerIP(dataArray[0]);
-//		this.client.setMainServerPort(Integer.parseInt(dataArray[1]));
-//		this.client.setServerSidePort(Integer.parseInt(dataArray[2]));
-//		this.client.setServices(dataArray[3]);
 		
 		this.client.setMainServerIP(data[0]);
 		this.client.setMainServerPort(Integer.parseInt(data[1]));
@@ -105,14 +98,8 @@ public class MainAppWindow {
 		this.client.setServices(data[3]);
 		this.sortingServer.setServices(data[3]);
 		
-//		this.sortingServerListeningPort = Integer.parseInt(data[2]);
-		
 		this.client.setTask(ClientThread.CONNECT);
-//		this.client = new Thread(c);
-//		this.client.start();
 		this.threadsExecutor.execute(client);
-//		btnConnect.setEnabled(false);
-//		btnDisconnect.setEnabled(true);
 	}
 	
 	public void manageButtons() {
@@ -137,13 +124,13 @@ public class MainAppWindow {
 		this.threadsExecutor.execute(client);
 		this.threadsExecutor.shutdown();
 		this.sortingServer.stopMainSortingServer();
-		try {
-			boolean r = this.threadsExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
-			System.out.println(r);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			boolean r = this.threadsExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
+//			System.out.println(r);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 	
 	public void updateLog(StringBuffer data) {
@@ -158,6 +145,10 @@ public class MainAppWindow {
 	}
 	
 	public void startSorting(String algorithm, String data) {
+		if(this.client.isSorted(this.client.parseDataToArray(data))) {
+			JOptionPane.showMessageDialog(null, "Uneti niz je vec sortiran.", "Info", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
 		this.client.setTask(ClientThread.SORT);
 		this.client.setAlgorithm(algorithm);
 		this.client.setData(data);
@@ -171,7 +162,7 @@ public class MainAppWindow {
 		frmMainAppWindow = new JFrame();
 		frmMainAppWindow.setResizable(false);
 		frmMainAppWindow.setTitle("Aplikacija za distribuirano sortiranje");
-		frmMainAppWindow.setBounds(100, 100, 812, 571);
+		frmMainAppWindow.setBounds(100, 100, 1062, 740);
 		frmMainAppWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmMainAppWindow.getContentPane().add(getPanelServer(), BorderLayout.NORTH);
 		frmMainAppWindow.getContentPane().add(getPanelClient(), BorderLayout.CENTER);

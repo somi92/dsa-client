@@ -81,21 +81,6 @@ public class DSPSortingServer {
 		switch (pMethod) {
 			
 			case "SORT": {
-			
-//				if(pOptions.startsWith("B")) {
-//					setSort("B");
-//					setData(pData);
-//					setIteration(0);
-//					setState(DSPSortingServer.SORTING);
-//				} else if(pOptions.startsWith("S") || pOptions.startsWith("I")) {
-//					String[] sortParts = pOptions.split("#");
-//					setIteration(Integer.parseInt(sortParts[1]));
-//					setSort(sortParts[0]);
-//					setData(pData);
-//					setState(DSPSortingServer.SORTING);
-//				} else {
-//					
-//				}
 				
 				if(pOptions.startsWith("B") || pOptions.startsWith("S") || pOptions.startsWith("I")) {
 					String[] sortParts = pOptions.split("#");
@@ -103,8 +88,6 @@ public class DSPSortingServer {
 					setSort(sortParts[0]);
 					setData(pData);
 					setState(DSPSortingServer.SORTING);
-					
-//					System.out.println(getSort()+" "+getIteration());
 					
 				} else {
 					setIteration(0);

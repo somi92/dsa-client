@@ -48,8 +48,6 @@ public class SortingServerThread implements Runnable {
 						int iteration = protocol.getIteration();
 						int[] dataArray = null;
 						
-//						System.out.println(sort+" "+iteration+" data: "+dataString);
-						
 						if(this.services.contains(sort)) {
 						
 							if(sort.equals("B")) {
@@ -117,14 +115,4 @@ public class SortingServerThread implements Runnable {
 		}
 		return data.substring(0, data.length()-1);
 	}
-	
-//	private boolean isSorted(int[] data) {
-//		for(int i=0; i<data.length-1; i++) {
-//			if(data[i] > data[i+1]) {
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
-
 }

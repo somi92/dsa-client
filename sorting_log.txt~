@@ -1,0 +1,30 @@
+(vreme: Tue Dec 17 18:44:43 CET 2013)  Poslat upit za sorting servere glavnom serveru, : PEERS B
+(vreme: Tue Dec 17 18:44:43 CET 2013)  Niz koji je potrebno sortirati: 5,4,1,2,3(vreme: Tue Dec 17 18:44:43 CET 2013)  Glavni server je pronasao odgovarajuce sorting servere: PEERS /127.0.0.1:53398/127.0.0.1:57044
+(vreme: Tue Dec 17 18:44:43 CET 2013)  Zapocinje proces sortiranja, povezivanje sa sorting serverima...
+(vreme: Tue Dec 17 18:44:43 CET 2013)  Server 127.0.0.1:53398 je uradio 1. iteraciju sortiranja: FINISHED 4,1,2,3,5
+(vreme: Tue Dec 17 18:44:43 CET 2013)  Server 127.0.0.1:57044 je uradio 2. iteraciju sortiranja: FINISHED 1,2,3,4,5
+(vreme: Tue Dec 17 18:44:43 CET 2013)  Sortiranje je zavrseno, rezultat: 1,2,3,4,5
+(vreme: Tue Dec 17 18:44:43 CET 2013)  Obavestiti glavni server, sortiranje je zavrseno: FINISHED 1,2,3,4,5
+
+
+(vreme: Tue Dec 17 18:45:22 CET 2013)  Poslat upit za sorting servere glavnom serveru, : PEERS S
+(vreme: Tue Dec 17 18:45:22 CET 2013)  Niz koji je potrebno sortirati: 5,4,1,2,3(vreme: Tue Dec 17 18:45:22 CET 2013)  Glavni server je pronasao odgovarajuce sorting servere: PEERS /127.0.0.1:53398/127.0.0.1:57044
+(vreme: Tue Dec 17 18:45:22 CET 2013)  Zapocinje proces sortiranja, povezivanje sa sorting serverima...
+(vreme: Tue Dec 17 18:45:22 CET 2013)  Server 127.0.0.1:53398 je uradio 1. iteraciju sortiranja: FINISHED 1,4,5,2,3
+(vreme: Tue Dec 17 18:45:22 CET 2013)  Server 127.0.0.1:57044 je uradio 2. iteraciju sortiranja: FINISHED 1,2,5,4,3
+(vreme: Tue Dec 17 18:45:22 CET 2013)  Server 127.0.0.1:53398 je uradio 3. iteraciju sortiranja: FINISHED 1,2,3,4,5
+(vreme: Tue Dec 17 18:45:22 CET 2013)  Sortiranje je zavrseno, rezultat: 1,2,3,4,5
+(vreme: Tue Dec 17 18:45:22 CET 2013)  Obavestiti glavni server, sortiranje je zavrseno: FINISHED 1,2,3,4,5
+
+
+(vreme: Tue Dec 17 18:45:26 CET 2013)  Poslat upit za sorting servere glavnom serveru, : PEERS I
+(vreme: Tue Dec 17 18:45:26 CET 2013)  Niz koji je potrebno sortirati: 5,4,1,2,3(vreme: Tue Dec 17 18:45:26 CET 2013)  Glavni server je pronasao odgovarajuce sorting servere: PEERS /127.0.0.1:53398/127.0.0.1:57044
+(vreme: Tue Dec 17 18:45:26 CET 2013)  Zapocinje proces sortiranja, povezivanje sa sorting serverima...
+(vreme: Tue Dec 17 18:45:26 CET 2013)  Server 127.0.0.1:53398 je uradio 1. iteraciju sortiranja: FINISHED 4,5,1,2,3
+(vreme: Tue Dec 17 18:45:26 CET 2013)  Server 127.0.0.1:57044 je uradio 2. iteraciju sortiranja: FINISHED 1,4,5,2,3
+(vreme: Tue Dec 17 18:45:26 CET 2013)  Server 127.0.0.1:53398 je uradio 3. iteraciju sortiranja: FINISHED 1,2,4,5,3
+(vreme: Tue Dec 17 18:45:26 CET 2013)  Server 127.0.0.1:57044 je uradio 4. iteraciju sortiranja: FINISHED 1,2,3,4,5
+(vreme: Tue Dec 17 18:45:26 CET 2013)  Sortiranje je zavrseno, rezultat: 1,2,3,4,5
+(vreme: Tue Dec 17 18:45:26 CET 2013)  Obavestiti glavni server, sortiranje je zavrseno: FINISHED 1,2,3,4,5
+
+
