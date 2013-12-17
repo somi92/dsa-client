@@ -28,6 +28,7 @@ import client.ClientThread;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 //import java.util.concurrent.TimeUnit;
@@ -50,7 +51,7 @@ public class MainAppWindow {
 	private JLabel label_3;
 	private JScrollPane scrollPane;
 	private JPanel panel_3;
-	private JButton button_3;
+	private JButton btnExit;
 	private JTextArea txtLog;
 
 	private ExecutorService threadsExecutor;
@@ -167,6 +168,14 @@ public class MainAppWindow {
 		frmMainAppWindow.getContentPane().add(getPanelServer(), BorderLayout.NORTH);
 		frmMainAppWindow.getContentPane().add(getPanelClient(), BorderLayout.CENTER);
 		frmMainAppWindow.getContentPane().add(getPanel_3(), BorderLayout.SOUTH);
+		frmMainAppWindow.addWindowListener(new java.awt.event.WindowAdapter() {
+	        public void windowClosing(WindowEvent winEvt) {
+	        	if(btnDisconnect.isEnabled()) {
+	        		closeConnection();
+	        	}
+	            System.exit(0);
+	        }
+	    });
 	}
 
 	private JPanel getPanelServer() {
@@ -364,25 +373,23 @@ public class MainAppWindow {
 		if (panel_3 == null) {
 			panel_3 = new JPanel();
 			panel_3.setPreferredSize(new Dimension(10, 50));
-			panel_3.add(getButton_3());
+			panel_3.add(getBtnExit());
 		}
 		return panel_3;
 	}
-	private JButton getButton_3() {
-		if (button_3 == null) {
-			button_3 = new JButton("New button");
-			button_3.addActionListener(new ActionListener() {
+	private JButton getBtnExit() {
+		if (btnExit == null) {
+			btnExit = new JButton("Zatvori aplikaciju");
+			btnExit.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-//					System.out.println(data);
-//					System.out.println(client.isAlive());
-//					System.out.println(client.getState());
-//					client.start();
-//					client.interrupt();
-//					System.out.println(client.toString());
+					if(btnDisconnect.isEnabled()) {
+		        		closeConnection();
+		        	}
+		            System.exit(0);
 				}
 			});
 		}
-		return button_3;
+		return btnExit;
 	}
 	private JTextArea getTxtLog() {
 		if (txtLog == null) {
