@@ -32,6 +32,7 @@ import java.awt.event.WindowEvent;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 //import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class MainAppWindow {
 
@@ -125,13 +126,14 @@ public class MainAppWindow {
 		this.threadsExecutor.execute(client);
 		this.threadsExecutor.shutdown();
 		this.sortingServer.stopMainSortingServer();
-//		try {
+		try {
+			this.threadsExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
 //			boolean r = this.threadsExecutor.awaitTermination(1000, TimeUnit.MILLISECONDS);
 //			System.out.println(r);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void updateLog(StringBuffer data) {
